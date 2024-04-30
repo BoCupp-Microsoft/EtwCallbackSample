@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WindowsPerformanceRecorder Version="1.0" Comments="ETW Callback Sample" Company="Microsoft Corporation" Copyright="Microsoft Corporation">
+    <Profiles>
+        <EventCollector Id="EventCollector_UserMode" Name="User Mode Event Collector">
+            <BufferSize Value="1024"/>
+            <Buffers Value="2" PercentageOfTotalMemory="true" MaximumBufferSpace="64" />
+        </EventCollector>
+
+        <EventProvider Id="EtwCallbackSample" Name="0205c222-cf97-5c11-9756-56a2cee02cb0" Level="5" NonPagedMemory="true">
+            <Keywords>
+                <Keyword Value="0x1"/>
+            </Keywords>
+            <CaptureStateOnStart>
+                <Keyword Value="0x2"/>
+            </CaptureStateOnStart>
+            <CaptureStateOnSave>
+                <Keyword Value="0x4"/>
+            </CaptureStateOnSave>
+        </EventProvider>
+
+        <Profile Id="EtwCallbackSample.Verbose.Memory" LoggingMode="Memory" Name="EtwCallbackSample" DetailLevel="Verbose" Description="EtwCallbackSample">
+            <Collectors>
+                <EventCollectorId Value="EventCollector_UserMode">
+                    <EventProviders>
+                        <EventProviderId Value="EtwCallbackSample" />
+                    </EventProviders>
+                </EventCollectorId>
+            </Collectors>
+        </Profile>
+    </Profiles>
+</WindowsPerformanceRecorder>
