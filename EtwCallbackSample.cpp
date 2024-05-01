@@ -1,11 +1,15 @@
 #include <bitset>
 #include <conio.h>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include <windows.h> // Definitions required by TraceLoggingProvider.h
 #include <TraceLoggingProvider.h> // The C/C++ TraceLogging API
 
 using namespace std;
+
+void EmitCaptureStateEvents(ULONGLONG match_any_keyword, ULONGLONG match_all_keyword);
 
 // Define a handle to a TraceLogging provider
 TRACELOGGING_DEFINE_PROVIDER(
@@ -29,6 +33,12 @@ void WINAPI ETWEnableCallback(LPCGUID /* source_id */, ULONG is_enabled,
     << "; filter_data:" << (void*)filter_data
     << endl
   ;
+
+  if (is_enabled == 2)
+  {
+    auto t = thread(EmitCaptureStateEvents, match_any_keyword, match_all_keyword);
+    t.join();
+  }
 }
 
 void LoopUntilQ()
@@ -56,4 +66,66 @@ int main()
   cout << endl << "Calling TraceLoggingUnregister." << endl;
   TraceLoggingUnregister(g_hMyComponentProvider);
   cout << "TraceLoggingUnregister returned." << endl;
+}
+
+
+void EmitCaptureStateEvents(ULONGLONG match_any_keyword, ULONGLONG match_all_keyword)
+{
+  cout
+    << "Emitting capture state events for "
+    << "; match_any_keyword:" << (void*)match_any_keyword
+    << "; match_all_keyword:" << (void*)match_all_keyword
+    << endl
+  ;
+
+  this_thread::sleep_for(chrono::milliseconds(10000));
+
+  TraceLoggingWrite(
+    g_hMyComponentProvider, 
+    "capturestate-event1",
+    TraceLoggingLevel(1),
+    TraceLoggingKeyword(0x1)
+  );
+
+  TraceLoggingWrite(
+    g_hMyComponentProvider,
+    "capturestate-event2",
+    TraceLoggingLevel(1),
+    TraceLoggingKeyword(0x2)
+  );
+
+  TraceLoggingWrite(
+    g_hMyComponentProvider,
+    "capturestate-event4",
+    TraceLoggingLevel(1),
+    TraceLoggingKeyword(0x4)
+  );
+
+  TraceLoggingWrite(
+    g_hMyComponentProvider,
+    "capturestate-event8",
+    TraceLoggingLevel(1),
+    TraceLoggingKeyword(0x8)
+  );
+
+  TraceLoggingWrite(
+    g_hMyComponentProvider,
+    "capturestate-event10",
+    TraceLoggingLevel(1),
+    TraceLoggingKeyword(0x10)
+  );
+
+  TraceLoggingWrite(
+    g_hMyComponentProvider,
+    "capturestate-event20",
+    TraceLoggingLevel(1),
+    TraceLoggingKeyword(0x20)
+  );
+
+  cout
+    << "Done emitting capture state events for "
+    << "; match_any_keyword:" << (void*)match_any_keyword
+    << "; match_all_keyword:" << (void*)match_all_keyword
+    << endl
+  ;
 }
